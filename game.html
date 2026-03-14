@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🏚️ Бункер — Игра</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏚️</text></svg>">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/game.css">
+</head>
+<body class="game-body" data-page="game">
+<div class="toast-container" id="toast-container"></div>
+
+<!-- TOPBAR -->
+<header class="game-topbar">
+  <div class="gtb-logo"><a href="index.html" class="grad-text">🏚️</a></div>
+  <div class="gtb-room-info">
+    <span class="gtb-room-name" id="gtb-room-name"></span>
+    <span class="gtb-phase-badge phase-waiting" id="gtb-phase"></span>
+  </div>
+  <div class="gtb-center">
+    <span class="gtb-count" id="gtb-count"></span>
+  </div>
+  <div class="gtb-right">
+    <button class="btn btn-ghost btn-sm" id="vote-btn"      onclick="openVote()"   style="display:none">🗳️ Голосование</button>
+    <button class="btn btn-accent btn-sm" id="top-start-btn" onclick="startGame()"  style="display:none">▶ Начать игру</button>
+    <button class="btn btn-red btn-sm"                       onclick="leaveRoom()">🚪 Выйти</button>
+    <div style="display:flex;align-items:center;gap:7px;padding-left:10px;border-left:1px solid var(--border);margin-left:4px">
+      <div class="avatar avatar-sm nav-avatar" style="background:var(--accent)">?</div>
+      <span class="nav-username" style="font-size:.8rem;font-weight:600;color:var(--text2)"></span>
+      <button class="btn btn-ghost btn-xs" onclick="doLogout()">Выйти</button>
+    </div>
+  </div>
+</header>
+
+<!-- ═══ LOBBY VIEW ═══ -->
+<div class="game-view active" id="lobby-view">
+  <div class="lobby-body">
+    <div class="lobby-top">
+      <div>
+        <div class="lobby-heading">🎮 Активные игры</div>
+        <div class="lobby-sub">Выбери комнату или создай свою</div>
+      </div>
+      <div class="lobby-btns">
+        <button class="btn btn-ghost btn-sm" onclick="refreshRoomsList()">🔄 Обновить</button>
+        <button class="btn btn-outline btn-sm" onclick="openJoinModal()">🔑 По коду</button>
+        <button class="btn btn-accent" onclick="openCreateModal()">➕ Создать игру</button>
+      </div>
+    </div>
+    <div class="rooms-list">
+      <div class="rooms-grid" id="rooms-grid"></div>
+      <div class="rooms-empty" id="rooms-empty" style="display:none">
+        <div class="ee">🏚️</div>
+        <p>Нет активных игр</p>
+        <button class="btn btn-accent" style="margin-top:12px" onclick="openCreateModal()">➕ Создать первую</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ROOM VIEW ═══ -->
+<div class="game-view" id="room-view" style="flex-direction:column">
+
+  <!-- WAITING -->
+  <div class="game-view" id="waiting-view" style="flex-direction:column">
+    <div class="waiting-wrap">
+      <div class="waiting-eyebrow">Ожидание игроков</div>
+      <div class="waiting-title" id="wv-name">Название</div>
+      <div>
+        <div class="waiting-code-label">Код комнаты — нажми чтобы скопировать</div>
+        <div class="waiting-code" id="wv-code" onclick="copyRoomCode()">XXXX</div>
+      </div>
+      <div>
+        <div style="font-size:.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);text-align:center;margin-bottom:9px">Участники</div>
+        <div class="waiting-players-grid" id="wv-players"></div>
+      </div>
+      <div class="waiting-meta" id="wv-meta"></div>
+      <div class="waiting-actions">
+        <button class="btn btn-ghost" id="wv-mic-btn" onclick="toggleMic()">🎤 Мик вкл</button>
+        <button class="btn btn-ghost" id="wv-cam-btn" onclick="toggleCam()">📹 Кам вкл</button>
+        <button class="btn btn-accent" id="wv-start-btn" onclick="startGame()" style="display:none">▶ Начать игру</button>
+      </div>
+      <div style="font-size:.76rem;color:var(--muted);text-align:center;max-width:380px">
+        💡 Минимум 2 игрока. Хост управляет игрой и может выгонять.
+      </div>
+    </div>
+  </div>
+
+  <!-- PLAYING -->
+  <div class="game-view" id="playing-view" style="flex-direction:column">
+    <div class="phase-banner">
+      <div class="pb-text" id="phase-banner-text"><strong>Знакомство</strong> — представляйте карточки по очереди</div>
+      <div class="pb-actions">
+        <button class="btn btn-ghost btn-xs" id="pb-reveal-all" onclick="revealAllMyCard()" style="display:none">👁 Раскрыть всё</button>
+        <button class="btn btn-xs btn-red"   id="pb-host-tally" onclick="hostTallyVotes()"  style="display:none">📊 Подвести итоги</button>
+      </div>
+    </div>
+
+    <div class="playing-wrap" style="flex:1;overflow:hidden">
+
+      <!-- Players -->
+      <div class="players-panel">
+        <div class="panel-head"><span>Игроки</span><span id="alive-count" style="color:var(--accent)"></span></div>
+        <div class="players-list" id="players-list"></div>
+      </div>
+
+      <!-- Center -->
+      <div class="center-panel" style="position:relative;overflow:hidden">
+        <div style="flex:1;overflow:hidden">
+          <div class="video-grid vg-1" id="video-grid"></div>
+        </div>
+        <div class="controls-bar">
+          <button class="ctrl-btn" id="ctrl-mic" onclick="toggleMic()" title="Микрофон">🎤</button>
+          <button class="ctrl-btn" id="ctrl-cam" onclick="toggleCam()" title="Камера">📹</button>
+          <div class="ctrl-sep"></div>
+          <button class="ctrl-btn" onclick="openVote()"                 title="Голосование">🗳️</button>
+          <button class="ctrl-btn" onclick="switchRightTab('chat')"     title="Чат">💬</button>
+          <button class="ctrl-btn" onclick="switchRightTab('card')"     title="Карточка">🃏</button>
+          <button class="ctrl-btn" onclick="switchRightTab('bunker')"   title="Бункер">🏚️</button>
+        </div>
+
+        <!-- VOTE OVERLAY -->
+        <div class="vote-overlay overlay" id="vote-overlay">
+          <div class="vote-box">
+            <div class="vote-title">🗳️ Голосование</div>
+            <div class="vote-sub">Кого выгнать из бункера?</div>
+            <div class="vote-list" id="vote-list"></div>
+            <div class="vote-footer">
+              <button class="btn btn-ghost btn-sm" onclick="closeVote()">Отмена</button>
+              <button class="btn btn-red btn-sm" onclick="confirmVote()" id="confirm-vote-btn" disabled>Проголосовать</button>
+            </div>
+            <div id="vote-results-section" style="display:none">
+              <div class="vr-title">📊 Итоги голосования</div>
+              <div id="vote-results-list"></div>
+              <button class="btn btn-ghost btn-sm w-full" style="margin-top:9px" onclick="closeVote()">Закрыть</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- END GAME -->
+        <div class="endgame-overlay" id="endgame-overlay">
+          <div class="endgame-box">
+            <div class="eg-emoji" id="eg-emoji">🎉</div>
+            <div class="eg-title win" id="eg-title">Вы выжили!</div>
+            <div class="eg-desc" id="eg-desc"></div>
+            <div style="font-size:.68rem;letter-spacing:2px;text-transform:uppercase;color:var(--green);margin-bottom:8px">Выжившие</div>
+            <div class="eg-survivors" id="eg-survivors"></div>
+            <div style="font-size:.68rem;letter-spacing:2px;text-transform:uppercase;color:var(--red);margin-bottom:8px">Выгнаны</div>
+            <div class="eg-kicked" id="eg-kicked"></div>
+            <div class="eg-actions">
+              <button class="btn btn-accent" onclick="leaveRoom()">🏠 В лобби</button>
+              <button class="btn btn-outline" onclick="document.getElementById('endgame-overlay').classList.remove('open')">Закрыть</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right -->
+      <div class="right-panel">
+        <div class="right-tabs">
+          <button class="rtab active" id="rtab-card"   onclick="switchRightTab('card')">🃏 Карта</button>
+          <button class="rtab"        id="rtab-chat"   onclick="switchRightTab('chat')">💬 Чат<div class="notif-dot"></div></button>
+          <button class="rtab"        id="rtab-bunker" onclick="switchRightTab('bunker')">🏚️ Бункер</button>
+        </div>
+        <div class="right-content">
+          <div class="rpanel active card-panel" id="rpanel-card"><div id="char-card-container"></div></div>
+          <div class="rpanel chat-panel" id="rpanel-chat">
+            <div class="chat-messages" id="chat-messages"></div>
+            <div class="chat-input-row">
+              <input class="chat-input" id="chat-input" placeholder="Написать…" maxlength="300"/>
+              <button class="chat-send-btn" onclick="sendChat()">➤</button>
+            </div>
+          </div>
+          <div class="rpanel bunker-panel" id="rpanel-bunker"><div id="bunker-panel-content"></div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODALS ═══ -->
+<div class="overlay" id="create-modal">
+  <div class="modal modal-md">
+    <div class="modal-header"><h3>➕ Создать игру</h3><button class="btn-close" onclick="closeModal('create-modal')">✕</button></div>
+    <div class="modal-body">
+      <div class="field"><label>Название</label><input id="cr-name" placeholder="Бункер выживших" maxlength="40"/></div>
+      <div class="field"><label>Игроков</label>
+        <select id="cr-players">
+          <option value="4">4 игрока</option><option value="5">5 игроков</option>
+          <option value="6" selected>6 игроков</option><option value="7">7 игроков</option>
+          <option value="8">8 игроков</option><option value="10">10 игроков</option>
+        </select>
+      </div>
+      <div class="field"><label>Режим</label>
+        <select id="cr-preset">
+          <option value="classic">📖 Классика</option>
+          <option value="hard">⚔️ Хардкор</option>
+          <option value="fun">😄 Весёлый</option>
+        </select>
+      </div>
+      <div class="field"><label>Пароль (пусто = открытая)</label><input id="cr-password" type="password" placeholder="Необязательно"/></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('create-modal')">Отмена</button>
+      <button class="btn btn-accent" id="create-room-btn" onclick="createRoom()">🚀 Создать</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="join-modal">
+  <div class="modal modal-sm">
+    <div class="modal-header"><h3>🔑 Войти по коду</h3><button class="btn-close" onclick="closeModal('join-modal')">✕</button></div>
+    <div class="modal-body">
+      <div class="field"><label>Код (4 символа)</label>
+        <input id="jn-code" placeholder="XXXX" maxlength="4" style="font-family:'Unbounded';letter-spacing:6px;text-transform:uppercase;font-size:1.3rem;text-align:center" oninput="this.value=this.value.toUpperCase()"/>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('join-modal')">Отмена</button>
+      <button class="btn btn-accent" onclick="joinByCode()">Войти →</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="pass-modal">
+  <div class="modal modal-sm">
+    <div class="modal-header"><h3>🔒 Пароль комнаты</h3><button class="btn-close" onclick="closeModal('pass-modal')">✕</button></div>
+    <div class="modal-body">
+      <div class="field"><label>Пароль</label><input id="pm-pass" type="password" placeholder="Пароль…"/></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('pass-modal')">Отмена</button>
+      <button class="btn btn-accent" onclick="submitPass()">Войти</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/firebase-config.js"></script>
+<script src="js/data.js"></script>
+<script src="js/game.js"></script>
+</body>
+</html>

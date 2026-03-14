@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Бункер Онлайн — социальная игра на выживание с видеосвязью">
+<title>🏚️ Бункер Онлайн — Выживи. Убеди. Докажи ценность.</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏚️</text></svg>">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/index.css">
+</head>
+<body>
+<div class="toast-container" id="toast-container"></div>
+
+<!-- NAV -->
+<nav class="nav" id="main-nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo grad-text">🏚️ Бункер</a>
+    <ul class="nav-links">
+      <li><a href="#how">Как играть</a></li>
+      <li><a href="#features">Возможности</a></li>
+      <li><a href="#roles">Роли</a></li>
+      <li><a href="#disasters">Катастрофы</a></li>
+    </ul>
+    <div class="nav-actions">
+      <span class="nav-guest" style="display:flex;gap:8px;align-items:center;">
+        <button class="btn btn-outline btn-sm" onclick="openAuthModal('login')">Войти</button>
+        <button class="btn btn-accent btn-sm"  onclick="openAuthModal('register')">Регистрация</button>
+      </span>
+      <span class="nav-user" style="display:none;align-items:center;gap:8px;">
+        <div class="avatar avatar-sm nav-avatar" style="background:var(--accent)">?</div>
+        <span class="nav-username" style="font-size:.85rem;font-weight:600;color:var(--text2)"></span>
+        <a href="game.html" class="btn btn-accent btn-sm">🎮 Играть</a>
+        <button class="btn btn-ghost btn-sm" onclick="doLogout()">Выйти</button>
+      </span>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div><div class="hero-grid"></div>
+  <div class="hero-inner">
+    <div class="hero-content">
+      <div class="hero-badge">🔴 Мультиплеер онлайн</div>
+      <h1 class="hero-title">
+        <span class="grad-text">Бункер</span><br>Онлайн
+        <span class="hero-sub">Выживи. Убеди. Докажи свою ценность.</span>
+      </h1>
+      <p class="hero-desc">Катастрофа уничтожила цивилизацию. У каждого — уникальная профессия, здоровье и секреты. Бункер вмещает только половину. Кто выживет — решает группа.</p>
+      <div class="hero-actions">
+        <button class="btn btn-accent btn-lg" onclick="goToGame()">🎮 Начать играть</button>
+        <a href="#how" class="btn btn-outline btn-lg">Как это работает</a>
+      </div>
+      <div class="hero-stats">
+        <div><div class="hstat-num" id="stat-rooms">—</div><div class="hstat-label">Активных комнат</div></div>
+        <div><div class="hstat-num" id="stat-players">—</div><div class="hstat-label">Игроков онлайн</div></div>
+        <div><div class="hstat-num">10+</div><div class="hstat-label">Катастроф</div></div>
+        <div><div class="hstat-num">50+</div><div class="hstat-label">Профессий</div></div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div style="position:relative;max-width:360px;width:100%">
+        <div class="float-card fc1">🎭 Профессия: <strong style="color:var(--accent)">Хирург</strong></div>
+        <div class="float-card fc2">☣️ <strong style="color:var(--red)">Ядерная война</strong></div>
+        <div class="float-card fc3" style="font-size:.78rem">🗳️ Голосование…</div>
+        <div class="hero-mockup">
+          <div class="mockup-bar">
+            <div class="mockup-dot"></div><div class="mockup-dot"></div><div class="mockup-dot"></div>
+            <div class="mockup-t">🏚️ Bunker-7 · 4/6</div>
+          </div>
+          <div class="mockup-players">
+            <div class="mockup-player">
+              <div class="avatar avatar-sm" style="background:#e05c2a">А</div>
+              <div><div class="mp-name">Алексей</div><div class="mp-role">🩺 Хирург · 3/9</div></div>
+            </div>
+            <div class="mockup-player">
+              <div class="avatar avatar-sm" style="background:#3b82f6">М</div>
+              <div><div class="mp-name">Максим</div><div class="mp-role">⚗️ Химик · 2/9</div></div>
+            </div>
+            <div class="mockup-player">
+              <div class="avatar avatar-sm" style="background:#22c55e">Е</div>
+              <div><div class="mp-name">Елена</div><div class="mp-role">🌾 Агроном · 5/9</div></div>
+            </div>
+          </div>
+          <div style="text-align:center;font-size:.68rem;color:var(--muted);margin-bottom:10px">🏚️ «Гранит-7» · Мест: 3 · Выгнать: 1</div>
+          <div class="mockup-btn">🗳️ ГОЛОСОВАНИЕ</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LIVE ROOMS -->
+<section style="padding:0 clamp(20px,5vw,60px) 56px">
+  <div style="max-width:1200px;margin:0 auto">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:22px;display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start">
+      <div>
+        <div class="section-label" style="margin-bottom:10px">🔴 В эфире прямо сейчас</div>
+        <h3 style="font-family:'Unbounded';font-size:1rem;font-weight:700;margin-bottom:4px">Активные игры</h3>
+        <p style="font-size:.83rem;color:var(--muted2);margin-bottom:14px">Присоединяйся к существующим или создай свою</p>
+        <div id="live-rooms-preview"></div>
+        <a href="game.html" style="display:inline-flex;align-items:center;gap:5px;margin-top:12px;font-size:.8rem;color:var(--accent)">Все комнаты →</a>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center">
+          <div style="font-family:'Unbounded';font-size:1.7rem;font-weight:900;color:var(--green)" id="stat-playing">—</div>
+          <div style="font-size:.72rem;color:var(--muted);margin-top:3px">▶ Идут игры</div>
+        </div>
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center">
+          <div style="font-family:'Unbounded';font-size:1.7rem;font-weight:900;color:var(--yellow)" id="stat-waiting">—</div>
+          <div style="font-size:.72rem;color:var(--muted);margin-top:3px">⏳ Ожидают</div>
+        </div>
+        <div style="grid-column:1/-1"><button class="btn btn-accent w-full" onclick="goToGame()">🎮 Войти в лобби</button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW TO PLAY -->
+<section class="section" id="how">
+  <div class="section-inner">
+    <div class="section-header">
+      <div class="section-label">📖 Правила</div>
+      <h2>Как играть в Бункер?</h2>
+      <p>Простые правила — бесконечные истории. Каждая игра уникальна.</p>
+    </div>
+    <div class="steps-grid">
+      <div class="step-card"><div class="step-num">Шаг 1</div><div class="step-icon">🏚️</div><div class="step-title">Катастрофа</div><div class="step-desc">Ведущий открывает карту катастрофы. Ядерная война, пандемия, астероид — сценарий задаёт атмосферу.</div></div>
+      <div class="step-card"><div class="step-num">Шаг 2</div><div class="step-icon">🃏</div><div class="step-title">Карточки</div><div class="step-desc">Каждый получает уникальную карточку: профессия, здоровье, хобби, характер, фобия и секрет.</div></div>
+      <div class="step-card"><div class="step-num">Шаг 3</div><div class="step-icon">🎙️</div><div class="step-title">Презентация</div><div class="step-desc">По кругу каждый раскрывает часть карточки. Убеди группу, что именно ты нужен в бункере.</div></div>
+      <div class="step-card"><div class="step-num">Шаг 4</div><div class="step-icon">🗳️</div><div class="step-title">Голосование</div><div class="step-desc">После раундов группа голосует — кого выгнать. Проигравший покидает игру навсегда.</div></div>
+      <div class="step-card"><div class="step-num">Шаг 5</div><div class="step-icon">🏆</div><div class="step-title">Выжившие</div><div class="step-desc">Игра заканчивается когда в бункере остаётся нужное число игроков. Оставшиеся — победители!</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="section section-alt" id="features">
+  <div class="section-inner">
+    <div class="section-header">
+      <div class="section-label">⚡ Возможности</div>
+      <h2>Всё для идеальной игры</h2>
+      <p>Работает везде — на гитхабе, сервере, локально. Главное — интернет у всех игроков.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card"><div class="feature-icon" style="background:rgba(224,92,42,.12)">📹</div><div class="feature-title">Видеосвязь</div><div class="feature-desc">Встроенная поддержка веб-камеры и микрофона прямо в браузере. Видишь реакции — всё намного интереснее.</div></div>
+      <div class="feature-card"><div class="feature-icon" style="background:rgba(59,130,246,.12)">🌐</div><div class="feature-title">Реальный мультиплеер</div><div class="feature-desc">Комнаты синхронизируются через Firebase в реальном времени. Каждый игрок видит изменения мгновенно.</div></div>
+      <div class="feature-card"><div class="feature-icon" style="background:rgba(34,197,94,.12)">🃏</div><div class="feature-title">100+ уникальных карт</div><div class="feature-desc">56 профессий, 38 хобби, 32 состояния здоровья, 28 черт характера. Каждая игра — уникальная история.</div></div>
+      <div class="feature-card"><div class="feature-icon" style="background:rgba(234,179,8,.12)">🔒</div><div class="feature-title">Приватные комнаты</div><div class="feature-desc">Создавай закрытые комнаты с паролем только для друзей, или открытые — к вам могут присоединиться.</div></div>
+      <div class="feature-card"><div class="feature-icon" style="background:rgba(168,85,247,.12)">🗳️</div><div class="feature-title">Система голосования</div><div class="feature-desc">Продуманное голосование с живыми результатами. Хост управляет ходом игры и выгоняет по итогам.</div></div>
+      <div class="feature-card"><div class="feature-icon" style="background:rgba(239,68,68,.12)">💬</div><div class="feature-title">Чат + системные события</div><div class="feature-desc">Текстовый чат с историей. Все события (раскрытие карт, голосования) отображаются в чате автоматически.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ROLES -->
+<section class="section" id="roles">
+  <div class="section-inner">
+    <div class="section-header">
+      <div class="section-label">🎭 Карточки</div>
+      <h2>Кем ты окажешься?</h2>
+      <p>Каждый получает случайную профессию. Иногда везёт — иногда нужно убеждать.</p>
+    </div>
+    <div class="roles-grid">
+      <div class="role-card"><div class="role-emoji">🩺</div><div class="role-name">Хирург</div><div class="role-rarity" style="color:var(--green)">★★★★★ Нужен всем</div></div>
+      <div class="role-card"><div class="role-emoji">🌾</div><div class="role-name">Агроном</div><div class="role-rarity" style="color:var(--green)">★★★★☆ Важен</div></div>
+      <div class="role-card"><div class="role-emoji">⚗️</div><div class="role-name">Химик</div><div class="role-rarity" style="color:var(--yellow)">★★★☆☆ Полезен</div></div>
+      <div class="role-card"><div class="role-emoji">💻</div><div class="role-name">Программист</div><div class="role-rarity" style="color:var(--yellow)">★★★☆☆ Спорно</div></div>
+      <div class="role-card"><div class="role-emoji">🏗️</div><div class="role-name">Строитель</div><div class="role-rarity" style="color:var(--green)">★★★★☆ Важен</div></div>
+      <div class="role-card"><div class="role-emoji">⚡</div><div class="role-name">Электрик</div><div class="role-rarity" style="color:var(--green)">★★★★☆ Важен</div></div>
+      <div class="role-card"><div class="role-emoji">🎓</div><div class="role-name">Учитель</div><div class="role-rarity" style="color:var(--red)">★★☆☆☆ Тяжело</div></div>
+      <div class="role-card"><div class="role-emoji">🧬</div><div class="role-name">Генетик</div><div class="role-rarity" style="color:var(--purple)">★★★★★ Редкий</div></div>
+      <div class="role-card"><div class="role-emoji">🍳</div><div class="role-name">Повар</div><div class="role-rarity" style="color:var(--green)">★★★★☆ Важен</div></div>
+      <div class="role-card"><div class="role-emoji">🪖</div><div class="role-name">Военный</div><div class="role-rarity" style="color:var(--green)">★★★★★ Выживет</div></div>
+      <div class="role-card"><div class="role-emoji">🎣</div><div class="role-name">Рыбак</div><div class="role-rarity" style="color:var(--yellow)">★★★☆☆ Зависит</div></div>
+      <div class="role-card"><div class="role-emoji">🔬</div><div class="role-name">Биолог</div><div class="role-rarity" style="color:var(--green)">★★★★☆ Полезен</div></div>
+    </div>
+    <div style="text-align:center;color:var(--muted2);font-size:.88rem">...и ещё <strong style="color:var(--text)">39 профессий</strong> в случайной ротации</div>
+  </div>
+</section>
+
+<!-- DISASTERS -->
+<section class="section section-alt" id="disasters">
+  <div class="section-inner">
+    <div class="section-header">
+      <div class="section-label">🌍 Сценарии</div>
+      <h2>Что уничтожило цивилизацию?</h2>
+      <p>10 катастроф с разными условиями выживания. Каждая требует своих специалистов.</p>
+    </div>
+    <div class="disasters-grid">
+      <div class="disaster-card"><div class="disaster-icon">☢️</div><div><div class="disaster-name">Ядерная война</div><div class="disaster-desc">Радиация, ядерная зима, 20 лет. Угроза ★★★★★</div></div></div>
+      <div class="disaster-card"><div class="disaster-icon">🦠</div><div><div class="disaster-name">Пандемия Вируса-X</div><div class="disaster-desc">Летальность 96%, нет вакцины. Угроза ★★★★★</div></div></div>
+      <div class="disaster-card"><div class="disaster-icon">☄️</div><div><div class="disaster-name">Удар астероида</div><div class="disaster-desc">Ядерная зима 15 лет. Угроза ★★★★★</div></div></div>
+      <div class="disaster-card"><div class="disaster-icon">🤖</div><div><div class="disaster-name">Восстание ИИ</div><div class="disaster-desc">ИИ охотится на людей. Угроза ★★★★☆</div></div></div>
+      <div class="disaster-card"><div class="disaster-icon">🌊</div><div><div class="disaster-name">Глобальный потоп</div><div class="disaster-desc">+80м уровень океана. Угроза ★★★★☆</div></div></div>
+      <div class="disaster-card"><div class="disaster-icon">🌋</div><div><div class="disaster-name">Суперизвержение</div><div class="disaster-desc">Йеллоустон, 12 лет. Угроза ★★★★☆</div></div></div>
+      <div class="disaster-card"><div class="disaster-icon">👽</div><div><div class="disaster-name">Инопланетное вторжение</div><div class="disaster-desc">Терраформинг. Угроза ★★★★★</div></div></div>
+      <div class="disaster-card"><div class="disaster-icon">🍄</div><div><div class="disaster-name">Грибок-убийца</div><div class="disaster-desc">Зомби-споры. Угроза ★★★★★</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="cta-bg"></div>
+  <div class="cta-inner">
+    <div style="font-size:3.2rem;margin-bottom:14px">🏚️</div>
+    <h2 class="cta-title">Готов выжить?</h2>
+    <p class="cta-desc">Регистрируйся, создавай комнату и зови друзей. Кто попадёт в бункер — решает команда.</p>
+    <div class="cta-actions">
+      <button class="btn btn-accent btn-lg" onclick="goToGame()">🎮 Начать игру</button>
+      <button class="btn btn-outline btn-lg" onclick="openAuthModal('register')">📝 Регистрация</button>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-logo grad-text">🏚️ Бункер Онлайн</div>
+    <div class="footer-links"><a href="#how">Правила</a><a href="#features">Возможности</a><a href="game.html">Играть</a></div>
+    <div class="footer-copy">Сделано для игры с друзьями 💀</div>
+  </div>
+</footer>
+
+<!-- AUTH MODAL -->
+<div class="overlay" id="auth-modal">
+  <div class="modal modal-md">
+    <div class="modal-header">
+      <h3>🏚️ Вход в Бункер</h3>
+      <button class="btn-close" onclick="closeModal('auth-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="auth-tabs">
+        <button class="auth-tab active" onclick="authTab('login')">Войти</button>
+        <button class="auth-tab"        onclick="authTab('register')">Регистрация</button>
+      </div>
+      <div id="login-form">
+        <div class="field"><label>Логин</label><input id="li-user" placeholder="Твой логин" autocomplete="username"/></div>
+        <div class="field"><label>Пароль</label><input id="li-pass" type="password" placeholder="Пароль" autocomplete="current-password"/></div>
+        <button class="btn btn-accent w-full" onclick="doLogin()">🔐 Войти</button>
+      </div>
+      <div id="reg-form" class="hidden">
+        <div class="field"><label>Имя пользователя</label><input id="rg-user" placeholder="Мин. 2 символа" autocomplete="username"/></div>
+        <div class="field"><label>Пароль</label><input id="rg-pass" type="password" placeholder="Мин. 4 символа" autocomplete="new-password"/></div>
+        <div class="field"><label>Повторить пароль</label><input id="rg-pass2" type="password" placeholder="Ещё раз" autocomplete="new-password"/></div>
+        <button class="btn btn-accent w-full" onclick="doRegister()">🌟 Создать аккаунт</button>
+      </div>
+      <div id="auth-hint" style="text-align:center;font-size:.8rem;color:var(--muted2);padding-top:2px">
+        Нет аккаунта? <a href="#" onclick="authTab('register');return false" style="color:var(--accent)">Зарегистрироваться</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="js/firebase-config.js"></script>
+<script src="js/data.js"></script>
+<script src="js/game.js"></script>
+</body>
+</html>
